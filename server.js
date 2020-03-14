@@ -49,7 +49,7 @@ app.get('/api/customers', (req, res) => {
   res.json(customers);
 });
 
-app.post('/session', (req, res) => {
+app.post('/user/session', (req, res) => {
 
   var email = req.body.email;
   var password = req.body.password;
@@ -62,22 +62,22 @@ app.post('/session', (req, res) => {
     } else {
       console.log('Succesfull query \n');
       if(user != ''){
-        console.log();
         
         bcrypt.compare(password, user[0].password, function(err, result) {
           if (result == true) {
-            res.send(user);
-            res.redirect('/');
+            res.json(user[0].id);
+            console.log(user[0].id);
           } 
           else {
-          res.send('Incorrect password');
-          res.redirect('/');
+          res.json("wrong_pass");
+          console.log("Incorrect password");
           }
         });
 
       }
       else {
-        console.log("ne obsstaja")
+        res.json("wrong_user");
+        console.log("wrong_user")
       }
     }
   });
@@ -93,7 +93,7 @@ app.post('/session', (req, res) => {
   // res.json();
 });
 
-app.post('/registration', (req, res) => {
+app.post('/user/new', (req, res) => {
 
   var name = req.body.name;
   var email = req.body.email;
@@ -106,6 +106,7 @@ app.post('/registration', (req, res) => {
     connection.query(sql, [name, email, hash], (error, rows, fields) =>{
       if(!!error) {
         console.log('Error in query');
+        res.json('Error in query')
       } else {
         console.log('Succesfull query \n');
         if(rows != ''){
