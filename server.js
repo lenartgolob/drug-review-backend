@@ -67,15 +67,24 @@ app.post('/user/session', (req, res) => {
           if (result == true) {
             var name = user[0].name;
             var lastName = user[0].lastname;
-
             var avatarName = name.charAt(0);
-            console.log(avatarName);
+            var avatarLastName = lastName.charAt(0);
 
-            var avatarLastName = lastname.charAt(0);
-            console.log(avatarLastName);
+            var initials = avatarName + avatarLastName;
+            console.log(initials);
+            console.log(user[0].id);
+
+            var avatarColor = user[0].avatar_color;
+            var avatarFontColor = user[0].avatar_font_color;
+
+            console.log(avatarColor);
+            console.log(avatarFontColor);
 
 
-            res.json(user[0].id);
+            var obj = {"id" : user[0].id, "initials" : initials, "avatar_color" : avatarColor, "avatar_font_color" : avatarFontColor};
+
+
+            res.json(obj);
           } 
           else {
           res.json("wrong_pass");
@@ -104,6 +113,29 @@ app.post('/user/session', (req, res) => {
 
 app.post('/user/new', (req, res) => {
 
+  var rand = Math.floor(Math.random() * 4); 
+
+  switch(rand) {
+    case 0:
+      var avatarColor = "#FCEAD5";
+      var avatarFontColor = "#AA6410"
+      break;
+    case 1:
+      var avatarColor = "#C4F1FF";
+      var avatarFontColor = "#328AB4";
+      break;
+    case 2:
+        var avatarColor = "#DBFFE2";
+        var avatarFontColor = "#3B7C48"
+        break;
+    case 3:
+        var avatarColor = "#F7DAFA";
+        var avatarFontColor = "#892994"
+        break;
+    default:
+      // code block
+  }
+
   var name = req.body.name;
   var lastname = req.body.lastname;
   var email = req.body.email;
@@ -112,8 +144,8 @@ app.post('/user/new', (req, res) => {
   bcrypt.hash(password, saltRounds, function(err, hash) {
     console.log("Registration: " + hash)
 
-    var sql = "INSERT INTO users (name, lastname, email, password) VALUES (?, ?, ?, ?);";
-    connection.query(sql, [name, lastname, email, hash], (error, rows, fields) =>{
+    var sql = "INSERT INTO users (name, lastname, email, password, avatar_color, avatar_font_color) VALUES (?, ?, ?, ?, ?, ?);";
+    connection.query(sql, [name, lastname, email, hash, avatarColor, avatarFontColor], (error, rows, fields) =>{
       if(!!error) {
         console.log('Error in query');
         res.json(false)
