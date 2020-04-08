@@ -65,8 +65,17 @@ app.post('/user/session', (req, res) => {
         
         bcrypt.compare(password, user[0].password, function(err, result) {
           if (result == true) {
+            var name = user[0].name;
+            var lastName = user[0].lastname;
+
+            var avatarName = name.charAt(0);
+            console.log(avatarName);
+
+            var avatarLastName = lastname.charAt(0);
+            console.log(avatarLastName);
+
+
             res.json(user[0].id);
-            console.log(user[0].id);
           } 
           else {
           res.json("wrong_pass");
@@ -96,17 +105,18 @@ app.post('/user/session', (req, res) => {
 app.post('/user/new', (req, res) => {
 
   var name = req.body.name;
+  var lastname = req.body.lastname;
   var email = req.body.email;
   var password = req.body.password;
 
   bcrypt.hash(password, saltRounds, function(err, hash) {
     console.log("Registration: " + hash)
 
-    var sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?);";
-    connection.query(sql, [name, email, hash], (error, rows, fields) =>{
+    var sql = "INSERT INTO users (name, lastname, email, password) VALUES (?, ?, ?, ?);";
+    connection.query(sql, [name, lastname, email, hash], (error, rows, fields) =>{
       if(!!error) {
         console.log('Error in query');
-        res.json('Error in query')
+        res.json(false)
       } else {
         console.log('Succesfull query \n');
         if(rows != ''){
@@ -123,13 +133,50 @@ app.post('/user/new', (req, res) => {
 
 
 
-  console.log(name);
-  console.log(email);
-  console.log(password);
+  // console.log(name);
+  // console.log(lastname);
+  // console.log(email);
+  // console.log(password);
 
 
 
   // res.json();
+});
+
+app.post('/review/new', (req, res) => {
+
+  var user_id = req.body.user_id;
+  var drug = req.body.drug;
+  var rating = req.body.rating;
+  var title = req.body.title;
+  var review = req.body.review;
+
+  var sql = "INSERT INTO reviews (user_id, drug, rating, title, review) VALUES (?, ?, ?, ?, ?);";
+  connection.query(sql, [user_id, drug, rating, title, review], (error, rows, fields) =>{
+    if(!!error) {
+      console.log('Error in query');
+      console.log(error);
+      res.json('Error in query')
+    } else {
+      console.log('Succesfull query \n');
+      var msg = "success"
+      res.json(msg);
+}
+  });
+
+
+
+
+
+
+  console.log(drug);
+  console.log(rating);
+  console.log(title);
+  console.log(review);
+
+
+
+
 });
 const port = 5000;
 
