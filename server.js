@@ -38,16 +38,85 @@ app.get('/users', (req, res) => {
   });
 });
 
+app.get('/reviews/recent', (req, res) => {
+  connection.query("SELECT * FROM reviews ORDER BY created_at DESC LIMIT 3", (error, rows, fields) =>{
+    if(!!error) {
+      console.log('Error in query');
+    } else {
+      console.log('Succesfull query \n');
+    }
+    var user_id1 = rows[0].user_id;
+    var user_id2 = rows[1].user_id;
+    var user_id3 = rows[2].user_id;
 
-app.get('/api/customers', (req, res) => {
-  const customers = [
-    {id: 1, firstName: 'John', lastName: 'Doe'},
-    {id: 2, firstName: 'Brad', lastName: 'Traversy'},
-    {id: 3, firstName: 'Mary', lastName: 'Swanson'},
-  ];
+    var users = {}
+    
+    var sql1 = "SELECT * FROM users WHERE id = ?";
+    connection.query(sql1, user_id1, (error, user1, fields) =>{
+      if(!!error) {
+        console.log('Error in query');
+      } else {
+        var name = user1[0].name;
+        var lastName = user1[0].lastname;
+        var avatarName = name.charAt(0);
+        var avatarLastName = lastName.charAt(0);
 
-  res.json(customers);
+        var initials = avatarName + avatarLastName;
+
+        var obj1 = {"drug" : rows[0].drug, "rating" : rows[0].rating, "title" : rows[0].title, "review" : rows[0].review,
+        "avatar_color" : user1[0].avatar_color, "avatar_font_color" : user1[0].avatar_font_color, "initials" : initials};
+
+        var sql2 = "SELECT * FROM users WHERE id = ?";
+        connection.query(sql2, user_id2, (error, user2, fields) =>{
+          if(!!error) {
+            console.log('Error in query');
+          } else {
+            var name = user2[0].name;
+            var lastName = user2[0].lastname;
+            var avatarName = name.charAt(0);
+            var avatarLastName = lastName.charAt(0);
+
+            var initials = avatarName + avatarLastName;
+
+            var obj2 = {"drug" : rows[1].drug, "rating" : rows[1].rating, "title" : rows[1].title, "review" : rows[1].review,
+            "avatar_color" : user2[0].avatar_color, "avatar_font_color" : user2[0].avatar_font_color, "initials" : initials};
+
+            var sql3 = "SELECT * FROM users WHERE id = ?";
+            connection.query(sql3, user_id3, (error, user3, fields) =>{
+              if(!!error) {
+                console.log('Error in query');
+              } else {
+                var name = user3[0].name;
+                var lastName = user3[0].lastname;
+                var avatarName = name.charAt(0);
+                var avatarLastName = lastName.charAt(0);
+    
+                var initials = avatarName + avatarLastName;
+
+                var obj3 = {"drug" : rows[2].drug, "rating" : rows[2].rating, "title" : rows[2].title, "review" : rows[2].review, 
+                "avatar_color" : user3[0].avatar_color, "avatar_font_color" : user3[0].avatar_font_color, "initials" : initials};
+
+
+                array = [obj1, obj2, obj3];
+                res.json(array)
+
+              }
+            });
+
+
+          }
+        });
+
+      }
+    });
+
+
+
+
+    // console.log(userArray)
+  });
 });
+
 
 app.post('/user/session', (req, res) => {
 
