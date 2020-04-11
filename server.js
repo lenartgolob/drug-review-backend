@@ -102,17 +102,10 @@ app.get('/reviews/recent', (req, res) => {
 
               }
             });
-
-
           }
         });
-
       }
     });
-
-
-
-
     // console.log(userArray)
   });
 });
@@ -150,7 +143,7 @@ app.post('/user/session', (req, res) => {
             console.log(avatarFontColor);
 
 
-            var obj = {"id" : user[0].id, "initials" : initials, "avatar_color" : avatarColor, "avatar_font_color" : avatarFontColor};
+            var obj = {"id" : user[0].id, "initials" : initials, "avatar_color" : avatarColor, "avatar_font_color" : avatarFontColor, "admin" : user[0].admin};
 
 
             res.json(obj);
@@ -168,16 +161,6 @@ app.post('/user/session', (req, res) => {
       }
     }
   });
-
-
-
-
-  console.log(email);
-  console.log(password);
-
-
-
-  // res.json();
 });
 
 app.post('/user/new', (req, res) => {
@@ -220,28 +203,11 @@ app.post('/user/new', (req, res) => {
         res.json(false)
       } else {
         console.log('Succesfull query \n');
-        if(rows != ''){
-          res.json(rows)
-        }
-        else {
-          console.log("crnc")
-        }
-        console.log(rows);
+        res.json(rows)
       }
     });
 
   });
-
-
-
-  // console.log(name);
-  // console.log(lastname);
-  // console.log(email);
-  // console.log(password);
-
-
-
-  // res.json();
 });
 
 app.post('/review/new', (req, res) => {
@@ -264,21 +230,129 @@ app.post('/review/new', (req, res) => {
       res.json(msg);
 }
   });
+});
 
+app.post('/reviews', (req, res) => {
 
-
-
-
-
+  var drug = req.body.drug;
   console.log(drug);
-  console.log(rating);
-  console.log(title);
-  console.log(review);
 
+  var sql = "SELECT r.*, u.name, u.lastname, u.avatar_color, u.avatar_font_color FROM reviews r INNER JOIN users u ON u.id = r.user_id WHERE (r.drug = ?) ORDER BY r.id DESC";
+  connection.query(sql, drug, (error, reviews, fields) =>{
+    if(!!error) {
+      console.log('Error in query');
+      console.log(error);
+      res.json('Error in query')
+    } else {
+      console.log('Succesfull query \n');
+      // var reviewsArray = Object.keys(reviews).map(i => reviews[i])
+      console.log(reviews[0]);
 
+      // var array = [reviews[0], reviews[1], reviews[2]]
+      res.json(reviews);
+}
+  });
+});
+
+app.get('/all/reviews', (req, res) => {
+
+  var sql = "SELECT r.*, u.name, u.lastname, u.avatar_color, u.avatar_font_color FROM reviews r INNER JOIN users u ON u.id = r.user_id ORDER BY r.id DESC";
+  connection.query(sql, (error, reviews, fields) =>{
+    if(!!error) {
+      console.log('Error in query');
+      console.log(error);
+      res.json('Error in query')
+    } else {
+      console.log('Succesfull query \n');
+      console.log(reviews[0]);
+      res.json(reviews);
+}
+  });
+});
+
+app.post('/my/reviews', (req, res) => {
+
+  var id = req.body.id;
+  console.log(id);
+
+  var sql = "SELECT r.*, u.name, u.lastname FROM reviews r INNER JOIN users u ON u.id = r.user_id WHERE (user_id=?) ORDER BY r.id DESC";
+  connection.query(sql, id, (error, reviews, fields) =>{
+    if(!!error) {
+      console.log('Error in query');
+      console.log(error);
+      res.json('Error in query')
+    } else {
+      console.log('Succesfull query \n');
+      // var reviewsArray = Object.keys(reviews).map(i => reviews[i])
+      console.log(reviews[0]);
+
+      // var array = [reviews[0], reviews[1], reviews[2]]
+      res.json(reviews);
+}
+  });
+});
+
+app.post('/user/profile', (req, res) => {
+
+  var id = req.body.id;
+
+  var sql = "SELECT * FROM users WHERE (id=?)";
+  connection.query(sql, id, (error, user, fields) =>{
+    if(!!error) {
+      console.log('Error in query');
+      console.log(error);
+      res.json('Error in query')
+    } else {
+      console.log('Succesfull query \n');
+      // var reviewsArray = Object.keys(reviews).map(i => reviews[i])
+      // var array = [reviews[0], reviews[1], reviews[2]]
+      res.json(user);
+}
+  });
+});
+
+app.post('/user/profile/edit', (req, res) => {
+
+  var id = req.body.id;
+  var name = req.body.name;
+  var lastname = req.body.lastname;
+  var email = req.body.email;
+  var password = req.body.password;
+
+  var sql = "SELECT * FROM users WHERE id = ?";
+  connection.query(sql, id, (error, user, fields) =>{
+    if(!!error) {
+      console.log('Error in query');
+    } else {
+      console.log('Succesfull query \n');        
+        bcrypt.compare(password, user[0].password, function(err, result) {
+          if (result == true) {
+
+            var sql = "UPDATE users SET name = ?, lastname = ?, email = ? WHERE id = ?";
+            connection.query(sql, [name, lastname, email, id], (error, rows, fields) =>{
+              if(!!error) {
+                console.log('Error in query');
+                res.json(false)
+              } else {
+                console.log('Succesfull query \n');
+                res.json(true)
+              }
+            });
+
+            console.log("yessir")
+            // res.json(obj);
+          } 
+          else {
+          res.json("wrong_pass");
+          }
+        });
+
+    }
+  });
 
 
 });
+
 const port = 5000;
 
 app.listen(port, () => `Server running on port ${port}`);
