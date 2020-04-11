@@ -349,10 +349,46 @@ app.post('/user/profile/edit', (req, res) => {
 
     }
   });
-
-
 });
 
+app.post('/edit/review', (req, res) => {
+
+  var id = req.body.id;
+  console.log(id);
+
+  var sql = "SELECT * FROM reviews WHERE (id = ?)";
+  connection.query(sql, id, (error, review, fields) =>{
+    if(!!error) {
+      console.log('Error in query');
+      console.log(error);
+      res.json('Error in query')
+    } else {
+      console.log('Succesfull query \n');
+      res.json(review);
+}
+  });
+});
+
+app.post('/review/edit', (req, res) => {
+
+  var id = req.body.id;
+  var drug = req.body.drug;
+  var rating = req.body.rating;
+  var title = req.body.title;
+  var review = req.body.review;
+
+  var sql = "UPDATE reviews SET drug = ?, rating = ?, title = ?, review = ? WHERE id = ?";
+  connection.query(sql, [drug, rating, title, review, id], (error, rows, fields) =>{
+    if(!!error) {
+      console.log('Error in query');
+      console.log(error);
+      res.json(false)
+    } else {
+      console.log('Succesfull query \n');
+      res.json(true);
+  }
+  });
+});
 const port = 5000;
 
 app.listen(port, () => `Server running on port ${port}`);
