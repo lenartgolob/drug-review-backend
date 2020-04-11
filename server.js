@@ -389,6 +389,26 @@ app.post('/review/edit', (req, res) => {
   }
   });
 });
+
+app.post('/review/delete', (req, res) => {
+
+  var id = req.body.id;
+
+  console.log(id)
+
+  var sql = "DELETE FROM reviews WHERE id = ?";
+  connection.query(sql, id, (error, rows, fields) =>{
+    if(!!error) {
+      console.log('Error in query');
+      console.log(error);
+      res.json(false)
+    } else {
+      console.log('Succesfull query \n');
+      res.json(true);
+  }
+  });
+});
+
 const port = 5000;
 
 app.listen(port, () => `Server running on port ${port}`);
