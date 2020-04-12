@@ -2,6 +2,8 @@ var express = require('express');
 var cors = require('cors');
 var bodyParser = require("body-parser");
 var mysql = require('mysql');
+var validator = require("email-validator");
+
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -193,21 +195,25 @@ app.post('/user/new', (req, res) => {
   var email = req.body.email;
   var password = req.body.password;
 
-  bcrypt.hash(password, saltRounds, function(err, hash) {
-    console.log("Registration: " + hash)
-
-    var sql = "INSERT INTO users (name, lastname, email, password, avatar_color, avatar_font_color) VALUES (?, ?, ?, ?, ?, ?);";
-    connection.query(sql, [name, lastname, email, hash, avatarColor, avatarFontColor], (error, rows, fields) =>{
-      if(!!error) {
-        console.log('Error in query');
-        res.json(false)
-      } else {
-        console.log('Succesfull query \n');
-        res.json(rows)
-      }
+  if(validator.validate(email)) {
+    bcrypt.hash(password, saltRounds, function(err, hash) {
+      console.log("Registration: " + hash)
+  
+      var sql = "INSERT INTO users (name, lastname, email, password, avatar_color, avatar_font_color) VALUES (?, ?, ?, ?, ?, ?);";
+      connection.query(sql, [name, lastname, email, hash, avatarColor, avatarFontColor], (error, rows, fields) =>{
+        if(!!error) {
+          console.log('Error in query');
+          res.json(false)
+        } else {
+          console.log('Succesfull query \n');
+          res.json(rows)
+        }
+      });
     });
-
-  });
+  } 
+  else {
+    res.json("wrong_type")
+  }
 });
 
 app.post('/review/new', (req, res) => {
@@ -319,36 +325,42 @@ app.post('/user/profile/edit', (req, res) => {
   var email = req.body.email;
   var password = req.body.password;
 
-  var sql = "SELECT * FROM users WHERE id = ?";
-  connection.query(sql, id, (error, user, fields) =>{
-    if(!!error) {
-      console.log('Error in query');
-    } else {
-      console.log('Succesfull query \n');        
-        bcrypt.compare(password, user[0].password, function(err, result) {
-          if (result == true) {
+  if(validator.validate(email)) {
+    var sql = "SELECT * FROM users WHERE id = ?";
+    connection.query(sql, id, (error, user, fields) =>{
+      if(!!error) {
+        console.log('Error in query');
+      } else {
+        console.log('Succesfull query \n');        
+          bcrypt.compare(password, user[0].password, function(err, result) {
+            if (result == true) {
+  
+              var sql = "UPDATE users SET name = ?, lastname = ?, email = ? WHERE id = ?";
+              connection.query(sql, [name, lastname, email, id], (error, rows, fields) =>{
+                if(!!error) {
+                  console.log('Error in query');
+                  res.json(false)
+                } else {
+                  console.log('Succesfull query \n');
+                  res.json(true)
+                }
+              });
+  
+              console.log("yessir")
+              // res.json(obj);
+            } 
+            else {
+            res.json("wrong_pass");
+            }
+          });
+  
+      }
+    });
+  }
+  else {
+    res.json("wrong_type")
+  }
 
-            var sql = "UPDATE users SET name = ?, lastname = ?, email = ? WHERE id = ?";
-            connection.query(sql, [name, lastname, email, id], (error, rows, fields) =>{
-              if(!!error) {
-                console.log('Error in query');
-                res.json(false)
-              } else {
-                console.log('Succesfull query \n');
-                res.json(true)
-              }
-            });
-
-            console.log("yessir")
-            // res.json(obj);
-          } 
-          else {
-          res.json("wrong_pass");
-          }
-        });
-
-    }
-  });
 });
 
 app.post('/edit/review', (req, res) => {
