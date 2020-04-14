@@ -33,9 +33,11 @@ app.get('/users', (req, res) => {
   connection.query("SELECT * FROM users", (error, rows, fields) =>{
     if(!!error) {
       console.log('Error in query');
+      res.text("error")
     } else {
       console.log('Succesfull query \n');
       console.log(rows);
+      res.json(rows)
     }
   });
 });
