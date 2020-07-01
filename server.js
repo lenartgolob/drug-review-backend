@@ -14,10 +14,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const connection = mysql.createConnection({
-    host: 'remotemysql.com',
-    user: 'Y5fxMkzUaW',
-    password: 'BsZzSo4dBv',
-    database: 'Y5fxMkzUaW'
+    host: 'sql7.freemysqlhosting.net',
+    user: 'sql7351939',
+    password: 'c5CjXeeZKd',
+    database: 'sql7351939'
 });
 
 connection.connect(function(error){
