@@ -423,5 +423,5 @@ app.post('/review/delete', (req, res) => {
   });
 });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3306;
 app.listen(port);
