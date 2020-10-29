@@ -14,10 +14,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'id15261833_drug0review0username',
-    password: 'AusOZeWA7d',
-    database: 'id15261833_drug0review0name'
+    host: 'db4free.net',
+    user: 'lenartgolob',
+    password: '696ad11b',
+    database: 'drug0review'
 });
 
 connection.connect(function(error){
